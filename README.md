@@ -50,7 +50,12 @@ Verified so far:
 Verified on the watch (Galaxy Watch5, One UI 8 Watch, Wear OS 6): the alarm fires on time, the
 watch vibrates, the screen wakes, the ringing screen opens by itself with the overlay grant below,
 the scaled text is readable, and snooze works. Not yet exercised: sound, the every-N-days rule and
-simultaneous alarms. If your Android Studio
+simultaneous alarms.
+
+Open items as of 10 Nov 2026: voice control did not respond on the watch in its first version; the
+reworked listener and the "Test voice control" screen have been built but not yet tried on the
+watch. The editor contrast fix and the brighter yellow are likewise built but not yet confirmed on
+the watch. See also the development-machine issue near the end of this file. If your Android Studio
 ships a different AGP, let the **AGP Upgrade Assistant** adjust `gradle/libs.versions.toml`; keep
 the `kotlin` entry equal to the Kotlin Gradle plugin version that AGP release bundles (readable from
 the AGP POM on maven.google.com).
@@ -199,6 +204,28 @@ sends nothing anywhere.
 
 Database schema changes are handled by Room migrations in `data/AlarmDatabase.kt`, so updates keep
 existing alarms.
+
+## Open issue: desktop lock-ups on the development machine
+
+Observed on the Linux development desktop (not on the watch): a few minutes after each
+`./gradlew` build, the machine locked up hard and needed a power cycle. Since Gradle and adb
+stopped being used on that machine there have been no further crashes (noted 10 Nov 2026).
+
+That is a correlation, not a diagnosis. The cause was never identified: no journal output or memory
+figures were captured, and it is not known whether Gradle, adb, or the two together trigger it.
+Before building on that machine again:
+
+- Read the previous boot's log after a lock-up: `journalctl -b -1 -p warning --no-pager | tail -n 80`.
+  Out-of-memory kills point at the build's memory use; GPU resets, machine-check or thermal messages
+  point at a driver or hardware fault that the build load merely triggers.
+- Check memory and swap with `free -h` and `swapon --show`.
+- Untested mitigation, in `~/.gradle/gradle.properties`: `org.gradle.daemon=false`,
+  `org.gradle.jvmargs=-Xmx1536m`, `org.gradle.workers.max=2`, `kotlin.daemon.jvmargs=-Xmx1g`. This
+  stops the Gradle and Kotlin daemons from staying resident after a build.
+- To separate the two suspects, build with `./gradlew :app:assembleRelease` (no adb involved) and
+  install the APK in a separate step with `adb install -r`.
+
+The app on the watch is unaffected; it keeps running the last installed build.
 
 ## Known limitations and ideas
 
