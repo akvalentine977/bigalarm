@@ -53,8 +53,12 @@
             </intent-filter>
         </activity>
 
+        <!-- enableOnBackInvokedCallback=false: apps targeting API 36 no longer receive the Back
+             button as a key event by default. The ringing screen wants the key itself so that a
+             button press snoozes; see AlarmRingActivity.onKeyDown. -->
         <activity
             android:name=".ui.AlarmRingActivity"
+            android:enableOnBackInvokedCallback="false"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"

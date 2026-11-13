@@ -26,6 +26,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 import com.akvalentine.bigalarm.appGraph
+import com.akvalentine.bigalarm.core.Edits
 import com.akvalentine.bigalarm.core.Format
 import com.akvalentine.bigalarm.core.Schedule
 import kotlinx.coroutines.delay
@@ -65,13 +66,17 @@ fun EditAlarmScreen(
     val nextRing = remember(alarm) {
         Schedule.nextTrigger(alarm.copy(enabled = true, snoozedUntil = null), ZonedDateTime.now())
     }
+    // An alarm that is switched off turns back on as soon as anything about it is changed.
+    val original = EditDraft.original
+    val wasOff = original != null && !original.enabled
+    val turnsOn = original != null && wasOff && Edits.isChanged(original, alarm)
 
     ScreenScaffold(
         scrollState = listState,
         edgeButton = {
             EdgeButton(onClick = {
                 scope.launch {
-                    graph.actions.save(alarm)
+                    graph.actions.save(Edits.onSave(EditDraft.original, alarm))
                     EditDraft.clear()
                     onDone()
                 }
@@ -155,7 +160,12 @@ fun EditAlarmScreen(
             }
 
             item {
-                val hint = nextRing?.let { "Next ring ${Format.untilText(it, ZonedDateTime.now())}" } ?: "Will not ring"
+                val next = nextRing?.let { "Next ring ${Format.untilText(it, ZonedDateTime.now())}" } ?: "Will not ring"
+                val hint = when {
+                    turnsOn -> "Turns on when saved. $next"
+                    wasOff -> "Alarm is off. Any change turns it on."
+                    else -> next
+                }
                 Text(
                     hint,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),

@@ -16,6 +16,12 @@ glasses and it stops at 15 alarms.
   N days counted from a start date. Rules are computed in pure Kotlin and covered by unit tests.
 - **Per-alarm snooze and persistence.** Each alarm can have its own snooze length or use the app
   default, and can be set to ring until dismissed instead of timing out.
+- **Buttons snooze.** While an alarm is ringing, pressing either physical button snoozes it. The Back
+  button is handled as a key press. The Home button is reserved by the system and never reaches an
+  app, so the ringing screen snoozes when Android reports that the user's own action is taking them
+  away from it (`onUserLeaveHint`), which is what a Home press produces.
+- **Editing switches an alarm back on.** Changing anything about an alarm that is switched off turns
+  it on when saved. Saving it untouched leaves it off. The editor says which will happen.
 - **Voice control.** With the switch in Settings on (it asks for microphone permission), the ringing
   screen listens with the watch's own speech recogniser: say "stop" or "snooze". It only listens while
   the ringing screen is showing, so it pairs with the overlay grant below. Works best with
@@ -52,10 +58,15 @@ watch vibrates, the screen wakes, the ringing screen opens by itself with the ov
 the scaled text is readable, and snooze works. Not yet exercised: sound, the every-N-days rule and
 simultaneous alarms.
 
-Open items as of 10 Nov 2026: voice control did not respond on the watch in its first version; the
+Open items as of 13 Nov 2026: voice control did not respond on the watch in its first version; the
 reworked listener and the "Test voice control" screen have been built but not yet tried on the
 watch. The editor contrast fix and the brighter yellow are likewise built but not yet confirmed on
-the watch. See also the development-machine issue near the end of this file. If your Android Studio
+the watch. Button snooze is built but not yet tried on the watch; the Home-button route in
+particular depends on One UI Watch sending the standard "user leaving" signal. See also the
+development-machine issue near the end of this file.
+
+The GitHub repository this project was pushed to (`akvalentine977/public`) returned "not found" on
+13 Nov 2026, so the commits from that day exist only where this source tree was copied to. If your Android Studio
 ships a different AGP, let the **AGP Upgrade Assistant** adjust `gradle/libs.versions.toml`; keep
 the `kotlin` entry equal to the Kotlin Gradle plugin version that AGP release bundles (readable from
 the AGP POM on maven.google.com).
@@ -186,7 +197,8 @@ Room (alarms.db) ◄──► AlarmRepository ◄──► AlarmActions ──�
 ```
 
 - `core/` is pure Kotlin: `Alarm`, `Repeat`, `Schedule.nextTrigger()`, `Format`, `NameFormat`
-  (abbreviations and capitals) and `VoiceCommands` (what counts as "stop" or "snooze"). Unit-tested.
+  (abbreviations and capitals), `VoiceCommands` (what counts as "stop" or "snooze") and `Edits` (an
+  edited inactive alarm becomes active). Unit-tested.
 - Build: AGP 9 built-in Kotlin (no `kotlin-android` plugin), Compose compiler plugin matched to the
   bundled Kotlin version, KSP 2.3.x for Room (older KSP releases are incompatible with built-in
   Kotlin's source-set rules).
@@ -236,6 +248,9 @@ The app on the watch is unaffected; it keeps running the last installed build.
 - The notification text uses the system font size. Only the app's own screens get the big text.
 - Voice control cannot be reached through Bixby or Google Assistant; third-party watch apps have no
   hook into either. The in-app listener is the practical alternative.
+- Button snooze only works while the ringing screen is showing, so it needs the overlay grant above
+  (or a tap on the notification first). Anything else that takes the user away from the ringing
+  screen by their own action, such as a long-press that opens an assistant, also snoozes.
 
 ## References
 

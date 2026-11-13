@@ -44,6 +44,8 @@ class AlarmRingService : Service() {
     /** Id of the alarm being started or ringing; set synchronously so concurrent starts queue up. */
     private var activeId: Long? = null
     private var current: Alarm? = null
+    /** True from the moment the ringing alarm is dismissed or snoozed until the next one starts. */
+    private var finishing = false
     private var autoSilenceJob: Job? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
@@ -128,6 +130,10 @@ class AlarmRingService : Service() {
             if (activeId == null) advance()
             return
         }
+        // A second request for the same ring (double tap, or a button press followed by the
+        // "user is leaving" signal) must not advance the queue twice.
+        if (finishing) return
+        finishing = true
         autoSilenceJob?.cancel()
         ringer.stop()
         val graph = appGraph
@@ -141,6 +147,7 @@ class AlarmRingService : Service() {
 
     /** Starts the next queued alarm, or shuts the service down. */
     private fun advance() {
+        finishing = false
         current = null
         activeId = null
         val next = queue.removeFirstOrNull()
@@ -173,7 +180,10 @@ class AlarmRingService : Service() {
     // NEW_TASK is required when starting an activity from a service; the activity is excluded from recents.
     @SuppressLint("WearRecents")
     private fun tryOpenRingingScreen() {
-        val intent = Intent(this, AlarmRingActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // NO_USER_ACTION: this launch is not the user leaving whatever is on screen, so it must not
+        // trigger onUserLeaveHint (which the ringing screen itself treats as a Home-button press).
+        val intent = Intent(this, AlarmRingActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION)
         // Silently blocked by the system unless the overlay permission was granted via adb.
         runCatching { startActivity(intent) }.onFailure { Log.w(TAG, "Could not open ringing screen", it) }
     }
@@ -263,6 +273,7 @@ class AlarmRingService : Service() {
         releaseWakeLocks()
         current = null
         activeId = null
+        finishing = false
         queue.clear()
         publishState()
         scope.cancel()

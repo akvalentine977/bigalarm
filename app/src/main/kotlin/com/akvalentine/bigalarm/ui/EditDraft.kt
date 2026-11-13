@@ -12,7 +12,12 @@ object EditDraft {
     private val _alarm = MutableStateFlow<Alarm?>(null)
     val alarm: StateFlow<Alarm?> = _alarm
 
+    /** The stored alarm as it was when editing began; null while creating a new alarm. */
+    var original: Alarm? = null
+        private set
+
     fun start(alarm: Alarm) {
+        original = alarm.takeIf { it.id != 0L }
         _alarm.value = alarm
     }
 
@@ -22,5 +27,6 @@ object EditDraft {
 
     fun clear() {
         _alarm.value = null
+        original = null
     }
 }

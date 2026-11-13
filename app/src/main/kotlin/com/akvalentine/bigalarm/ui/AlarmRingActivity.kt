@@ -4,8 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -53,6 +56,10 @@ class AlarmRingActivity : ComponentActivity() {
         setTurnScreenOn(true)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        // Back button, callback route. Used when the system delivers "back" as a navigation event
+        // instead of a key event; the key route in onKeyDown normally gets there first.
+        onBackPressedDispatcher.addCallback(this) { snoozeFromButton("back callback") }
+
         setContent {
             BigAlarmTheme {
                 val alarm by RingingState.current.collectAsState()
@@ -72,6 +79,39 @@ class AlarmRingActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Physical buttons snooze the alarm. The Back button (and any extra "stem" buttons a watch has)
+     * arrive here as key events. The whole press, down and up, is consumed so that it does not
+     * also navigate back.
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode in SNOOZE_KEYS) {
+            if (event.repeatCount == 0) snoozeFromButton("key ${KeyEvent.keyCodeToString(keyCode)}")
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode in SNOOZE_KEYS) return true
+        return super.onKeyUp(keyCode, event)
+    }
+
+    /**
+     * The Home button is reserved by the system and never reaches an app as a key event. What an
+     * app does get is this callback, sent when the user's own action takes them away from the screen.
+     */
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        snoozeFromButton("user leaving (Home button)")
+    }
+
+    private fun snoozeFromButton(source: String) {
+        if (RingingState.current.value == null) return
+        Log.i(TAG, "Snoozing: $source")
+        AlarmRingService.snooze(this)
     }
 
     override fun onResume() {
@@ -104,6 +144,19 @@ class AlarmRingActivity : ComponentActivity() {
             },
             onStatus = { voiceStatus = it },
         ).also { it.start() }
+    }
+
+    private companion object {
+        const val TAG = "AlarmRingActivity"
+
+        /** Back, plus the multifunction "stem" buttons some watches have. Home is handled separately. */
+        val SNOOZE_KEYS = setOf(
+            KeyEvent.KEYCODE_BACK,
+            KeyEvent.KEYCODE_STEM_PRIMARY,
+            KeyEvent.KEYCODE_STEM_1,
+            KeyEvent.KEYCODE_STEM_2,
+            KeyEvent.KEYCODE_STEM_3,
+        )
     }
 }
 
