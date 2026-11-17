@@ -10,6 +10,7 @@ import android.util.Log
 import com.akvalentine.bigalarm.BigAlarmApp
 import com.akvalentine.bigalarm.R
 import com.akvalentine.bigalarm.appGraph
+import com.akvalentine.bigalarm.core.Brand
 import com.akvalentine.bigalarm.ui.AlarmRingActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentTitle("Alarm")
             .setContentText("Tap to open")
             .setCategory(Notification.CATEGORY_ALARM)
+            .setColor(Brand.YELLOW_ARGB)
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()

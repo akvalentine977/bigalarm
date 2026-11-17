@@ -17,6 +17,7 @@ import com.akvalentine.bigalarm.BigAlarmApp
 import com.akvalentine.bigalarm.R
 import com.akvalentine.bigalarm.appGraph
 import com.akvalentine.bigalarm.core.Alarm
+import com.akvalentine.bigalarm.core.Brand
 import com.akvalentine.bigalarm.core.Format
 import com.akvalentine.bigalarm.core.Schedule
 import com.akvalentine.bigalarm.ui.AlarmRingActivity
@@ -216,6 +217,11 @@ class AlarmRingService : Service() {
             .setContentText(text)
             .setCategory(Notification.CATEGORY_ALARM)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
+            // The notification panel is drawn by the watch, not by this app, so colour is a request:
+            // setColor gives the accent, and setColorized asks for it as the card's background,
+            // which Android permits for an ongoing foreground-service notification like this one.
+            .setColor(Brand.YELLOW_ARGB)
+            .setColorized(true)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(open)
@@ -239,6 +245,7 @@ class AlarmRingService : Service() {
             .setContentTitle("Missed: ${appGraph.settings.displayName(alarm)}")
             .setContentText(Format.time(alarm.hour, alarm.minute, DateFormat.is24HourFormat(this)))
             .setCategory(Notification.CATEGORY_ALARM)
+            .setColor(Brand.YELLOW_ARGB)
             .setAutoCancel(true)
             .build()
         notificationManager().notify(MISSED_NOTIFICATION_BASE + alarm.id.toInt(), notification)

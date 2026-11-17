@@ -14,6 +14,7 @@ import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.MaterialTheme
 import com.akvalentine.bigalarm.appGraph
 import com.akvalentine.bigalarm.core.Alarm
+import com.akvalentine.bigalarm.core.Brand
 import com.akvalentine.bigalarm.core.NameFormat
 import com.akvalentine.bigalarm.data.Settings
 
@@ -25,11 +26,11 @@ val LocalUppercaseNames = compositionLocalOf { true }
 
 /** Yellow on black: high contrast and easy on tired eyes. Surfaces keep the Material defaults. */
 val YellowColorScheme = ColorScheme(
-    primary = Color(0xFFF5F540),
+    primary = Color(Brand.YELLOW_ARGB),
     primaryDim = Color(0xFFD4D42A),
     primaryContainer = Color(0xFF50500A),
     onPrimary = Color(0xFF1A1A00),
-    onPrimaryContainer = Color(0xFFF5F540),
+    onPrimaryContainer = Color(Brand.YELLOW_ARGB),
     secondary = Color(0xFFE6D08A),
     secondaryDim = Color(0xFFC9B46E),
     secondaryContainer = Color(0xFF4A4120),

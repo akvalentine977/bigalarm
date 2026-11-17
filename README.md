@@ -246,6 +246,10 @@ The app on the watch is unaffected; it keeps running the last installed build.
   Data Layer API; the standalone design leaves room for it.
 - No tile or watch-face complication yet. A tile showing the next alarm would be a natural addition.
 - The notification text uses the system font size. Only the app's own screens get the big text.
+- The notification panel (swipe right from the watch face) is drawn by the watch, and Wear OS does
+  not allow custom notification layouts. The app asks for its yellow there with `setColor` and
+  `setColorized`; how much of the card and its Dismiss and Snooze buttons turn yellow is up to
+  One UI Watch.
 - Voice control cannot be reached through Bixby or Google Assistant; third-party watch apps have no
   hook into either. The in-app listener is the practical alternative.
 - Button snooze only works while the ringing screen is showing, so it needs the overlay grant above
