@@ -58,12 +58,20 @@ watch vibrates, the screen wakes, the ringing screen opens by itself with the ov
 the scaled text is readable, and snooze works. Not yet exercised: sound, the every-N-days rule and
 simultaneous alarms.
 
-Open items as of 13 Nov 2026: voice control did not respond on the watch in its first version; the
-reworked listener and the "Test voice control" screen have been built but not yet tried on the
-watch. The editor contrast fix and the brighter yellow are likewise built but not yet confirmed on
-the watch. Button snooze is built but not yet tried on the watch; the Home-button route in
-particular depends on One UI Watch sending the standard "user leaving" signal. See also the
-development-machine issue near the end of this file.
+Open items as of 17 Nov 2026, all built but none yet tried on the watch:
+
+- Voice control. Its first version did not respond on the watch; the reworked listener and the
+  "Test voice control" screen are untested.
+- The editor contrast fix and the brighter yellow.
+- Button snooze. The Home-button route in particular depends on One UI Watch sending the standard
+  "user leaving" signal.
+- Switching an inactive alarm back on when it is edited.
+- The yellow request for the notification panel, which the watch may honour fully, partly or not
+  at all.
+
+No commit is tagged `watch-ok` yet. The last build confirmed on the watch was the first release
+build of 5 Nov 2026, before the features above. See also the development-machine issue near the
+end of this file.
 
 This project lives at <https://github.com/akvalentine977/bigalarm>. It was moved there on 17 Nov 2026
 from a `projects/bigalarm` folder in an earlier repository that no longer exists. The commit history
