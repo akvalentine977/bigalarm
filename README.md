@@ -217,6 +217,14 @@ sends nothing anywhere.
 Database schema changes are handled by Room migrations in `data/AlarmDatabase.kt`, so updates keep
 existing alarms.
 
+## How changes land
+
+- Changes are committed straight to `main`. This is a single-developer project with no review step.
+- Everything pushed to `main` has been built, unit-tested and linted, but not necessarily tried on
+  a watch.
+- A build that has been confirmed working on the watch gets a tag on its commit, named
+  `watch-ok-YYYY-MM-DD`. To rebuild a version known to work, check out the newest such tag.
+
 ## Open issue: desktop lock-ups on the development machine
 
 Observed on the Linux development desktop (not on the watch): a few minutes after each
