@@ -65,9 +65,11 @@ the watch. Button snooze is built but not yet tried on the watch; the Home-butto
 particular depends on One UI Watch sending the standard "user leaving" signal. See also the
 development-machine issue near the end of this file.
 
-The GitHub repository this project was pushed to (`akvalentine977/public`) returned "not found" on
-13 Nov 2026, so the commits from that day exist only where this source tree was copied to. If your Android Studio
-ships a different AGP, let the **AGP Upgrade Assistant** adjust `gradle/libs.versions.toml`; keep
+This project lives at <https://github.com/akvalentine977/bigalarm>. It was moved there on 17 Nov 2026
+from a `projects/bigalarm` folder in an earlier repository that no longer exists. The commit history
+was carried over with the project at the repository root, so commit hashes differ from the old ones.
+
+If your Android Studio ships a different AGP, let the **AGP Upgrade Assistant** adjust `gradle/libs.versions.toml`; keep
 the `kotlin` entry equal to the Kotlin Gradle plugin version that AGP release bundles (readable from
 the AGP POM on maven.google.com).
 
@@ -87,10 +89,9 @@ and use `./gradlew` as below.
 
 ## Build
 
-Open `projects/bigalarm` in Android Studio and let it sync, or from a terminal:
+Open the repository folder in Android Studio and let it sync, or from a terminal in that folder:
 
 ```bash
-cd projects/bigalarm
 ./gradlew :app:assembleDebug
 ```
 
@@ -155,7 +156,6 @@ adb connect 192.168.1.50:37891
 5. Install:
 
 ```bash
-cd projects/bigalarm
 ./gradlew :app:installDebug
 ```
 
