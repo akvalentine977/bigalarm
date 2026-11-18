@@ -22,7 +22,8 @@ glasses and it stops at 15 alarms.
   away from it (`onUserLeaveHint`), which is what a Home press produces.
 - **Editing switches an alarm back on.** Changing anything about an alarm that is switched off turns
   it on when saved. Saving it untouched leaves it off. The editor says which will happen.
-- **Voice control.** With the switch in Settings on (it asks for microphone permission), the ringing
+- **Voice control (does not work on the Galaxy Watch5, see Status).** With the switch in Settings on
+  (it asks for microphone permission), the ringing
   screen listens with the watch's own speech recogniser: say "stop" or "snooze". It only listens while
   the ringing screen is showing, so it pairs with the overlay grant below. Works best with
   vibration-only alarms; an alarm tone playing at the same time makes recognition less reliable.
@@ -55,25 +56,30 @@ Verified so far:
 
 Verified on the watch (Galaxy Watch5, One UI 8 Watch, Wear OS 6): the alarm fires on time, the
 watch vibrates, the screen wakes, the ringing screen opens by itself with the overlay grant below,
-the scaled text is readable, snooze works, and pressing the physical buttons snoozes a ringing
-alarm. Not yet exercised: sound, the every-N-days rule and simultaneous alarms.
+the scaled text is readable, snooze works, pressing the physical buttons snoozes a ringing alarm,
+and editing an inactive alarm switches it back on. Not yet exercised: sound, the every-N-days rule
+and simultaneous alarms.
 
-Open items as of 18 Nov 2026, all built and installed on the watch but not yet confirmed there:
+Open items as of 18 Nov 2026, built and installed on the watch but not yet confirmed there:
 
-- Voice control. Its first version did not respond on the watch; the reworked listener and the
-  "Test voice control" screen are untested.
 - The editor contrast fix and the brighter yellow.
-- Switching an inactive alarm back on when it is edited.
 - The yellow request for the notification panel, which the watch may honour fully, partly or not
-  at all. This waits for an occasion when an alarm rings without the ringing screen in front.
+  at all. This waits for an occasion when an alarm rings without the ringing screen in front. To
+  force that for a test, withdraw the overlay grant with
+  `adb shell appops set com.akvalentine.bigalarm SYSTEM_ALERT_WINDOW default`, let an alarm ring,
+  swipe right from the watch face, then restore the grant with `allow` in place of `default`.
+
+Known not to work: voice control. Neither its first version nor the reworked listener responds on
+this watch. The owner has decided to leave it as it is, so it is not being fixed. It is off by
+default and nothing else depends on it.
 
 Commit `3e070df` is the code of the build installed on the watch on 18 Nov 2026, where button snooze
-was confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
+and switching an edited alarm back on were confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
 `git tag` does not list that tag, it still has to be created, because the session that recorded the
 confirmation was not allowed to push tags:
 
 ```bash
-git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze works"
+git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze and edit-turns-alarm-on work"
 git push origin watch-ok-2026-11-18
 ```
 
