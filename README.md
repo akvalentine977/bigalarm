@@ -57,12 +57,12 @@ Verified so far:
 Verified on the watch (Galaxy Watch5, One UI 8 Watch, Wear OS 6): the alarm fires on time, the
 watch vibrates, the screen wakes, the ringing screen opens by itself with the overlay grant below,
 the scaled text is readable, snooze works, pressing the physical buttons snoozes a ringing alarm,
-and editing an inactive alarm switches it back on. Not yet exercised: sound, the every-N-days rule
+editing an inactive alarm switches it back on, and the alarm name is readable on the edit screen in
+the brighter yellow. Not yet exercised: sound, the every-N-days rule
 and simultaneous alarms.
 
-Open items as of 18 Nov 2026, built and installed on the watch but not yet confirmed there:
+Open item as of 18 Nov 2026, built and installed on the watch but not yet confirmed there:
 
-- The editor contrast fix and the brighter yellow.
 - The yellow request for the notification panel, which the watch may honour fully, partly or not
   at all. This waits for an occasion when an alarm rings without the ringing screen in front. To
   force that for a test, withdraw the overlay grant with
@@ -73,13 +73,13 @@ Known not to work: voice control. Neither its first version nor the reworked lis
 this watch. The owner has decided to leave it as it is, so it is not being fixed. It is off by
 default and nothing else depends on it.
 
-Commit `3e070df` is the code of the build installed on the watch on 18 Nov 2026, where button snooze
-and switching an edited alarm back on were confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
+Commit `3e070df` is the code of the build installed on the watch on 18 Nov 2026, where button snooze,
+switching an edited alarm back on and the editor contrast fix were confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
 `git tag` does not list that tag, it still has to be created, because the session that recorded the
 confirmation was not allowed to push tags:
 
 ```bash
-git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze and edit-turns-alarm-on work"
+git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze, edit-turns-alarm-on and editor contrast"
 git push origin watch-ok-2026-11-18
 ```
 
