@@ -65,12 +65,17 @@ Notification panel, observed on the watch on 18 Nov 2026: the ringing notificati
 yellowish, so the colour request is honoured there. The Dismiss and Snooze buttons that appear
 after tapping the card stay gray.
 
-Open item, built but not yet tried on the watch: the labels and icons of those two buttons are now
-also requested in yellow. That is the only thing an app can ask for on them, and the watch may
-ignore it. To see that screen, deny the full-screen request with
+The labels and icons of those two buttons are also requested in yellow, which is the only thing an
+app can ask for on them. Tried on the watch the same day: the watch ignores it and the buttons stay
+gray. The owner has accepted that, since that screen is rarely seen: the ringing screen normally
+opens by itself. The request stays in the code in case other watch software honours it.
+
+To see that screen for a test, deny the full-screen request with
 `adb shell appops set com.akvalentine.bigalarm USE_FULL_SCREEN_INTENT deny`, let an alarm ring,
 swipe right from the watch face and tap the card. Set it back to `default` afterwards, or alarms
 will stop opening the ringing screen.
+
+No items are open as of 18 Nov 2026.
 
 Known not to work: voice control. Neither its first version nor the reworked listener responds on
 this watch. The owner has decided to leave it as it is, so it is not being fixed. It is off by
