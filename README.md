@@ -55,23 +55,21 @@ Verified so far:
 
 Verified on the watch (Galaxy Watch5, One UI 8 Watch, Wear OS 6): the alarm fires on time, the
 watch vibrates, the screen wakes, the ringing screen opens by itself with the overlay grant below,
-the scaled text is readable, and snooze works. Not yet exercised: sound, the every-N-days rule and
-simultaneous alarms.
+the scaled text is readable, snooze works, and pressing the physical buttons snoozes a ringing
+alarm. Not yet exercised: sound, the every-N-days rule and simultaneous alarms.
 
-Open items as of 17 Nov 2026, all built but none yet tried on the watch:
+Open items as of 18 Nov 2026, all built and installed on the watch but not yet confirmed there:
 
 - Voice control. Its first version did not respond on the watch; the reworked listener and the
   "Test voice control" screen are untested.
 - The editor contrast fix and the brighter yellow.
-- Button snooze. The Home-button route in particular depends on One UI Watch sending the standard
-  "user leaving" signal.
 - Switching an inactive alarm back on when it is edited.
 - The yellow request for the notification panel, which the watch may honour fully, partly or not
-  at all.
+  at all. This waits for an occasion when an alarm rings without the ringing screen in front.
 
-No commit is tagged `watch-ok` yet. The last build confirmed on the watch was the first release
-build of 5 Nov 2026, before the features above. See also the development-machine issue near the
-end of this file.
+The tag `watch-ok-2026-11-18` marks commit `3e070df`, the code of the build installed on the watch
+that day, where button snooze was confirmed. The commits after it change only this README. See also
+the development-machine issue near the end of this file.
 
 This project lives at <https://github.com/akvalentine977/bigalarm>. It was moved there on 17 Nov 2026
 from a `projects/bigalarm` folder in an earlier repository that no longer exists. The commit history
