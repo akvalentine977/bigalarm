@@ -25,7 +25,7 @@ glasses and it stops at 15 alarms.
 - **Voice control (does not work on the Galaxy Watch5, see Status).** With the switch in Settings on
   (it asks for microphone permission), the ringing
   screen listens with the watch's own speech recogniser: say "stop" or "snooze". It only listens while
-  the ringing screen is showing, so it pairs with the overlay grant below. Works best with
+  the ringing screen is showing, so it relies on that screen opening by itself. Works best with
   vibration-only alarms; an alarm tone playing at the same time makes recognition less reliable.
   The status line under the time on the ringing screen says what the recogniser is doing, and
   Settings has a "Test voice control" screen that lists the watch's speech services and shows what
@@ -55,19 +55,22 @@ Verified so far:
   pages on 4 Nov 2026.
 
 Verified on the watch (Galaxy Watch5, One UI 8 Watch, Wear OS 6): the alarm fires on time, the
-watch vibrates, the screen wakes, the ringing screen opens by itself with the overlay grant below,
+watch vibrates, the screen wakes, the ringing screen opens by itself,
 the scaled text is readable, snooze works, pressing the physical buttons snoozes a ringing alarm,
 editing an inactive alarm switches it back on, and the alarm name is readable on the edit screen in
 the brighter yellow. Not yet exercised: sound, the every-N-days rule
 and simultaneous alarms.
 
-Open item as of 18 Nov 2026, built and installed on the watch but not yet confirmed there:
+Notification panel, observed on the watch on 18 Nov 2026: the ringing notification's card comes out
+yellowish, so the colour request is honoured there. The Dismiss and Snooze buttons that appear
+after tapping the card stay gray.
 
-- The yellow request for the notification panel, which the watch may honour fully, partly or not
-  at all. This waits for an occasion when an alarm rings without the ringing screen in front. To
-  force that for a test, withdraw the overlay grant with
-  `adb shell appops set com.akvalentine.bigalarm SYSTEM_ALERT_WINDOW default`, let an alarm ring,
-  swipe right from the watch face, then restore the grant with `allow` in place of `default`.
+Open item, built but not yet tried on the watch: the labels and icons of those two buttons are now
+also requested in yellow. That is the only thing an app can ask for on them, and the watch may
+ignore it. To see that screen, deny the full-screen request with
+`adb shell appops set com.akvalentine.bigalarm USE_FULL_SCREEN_INTENT deny`, let an alarm ring,
+swipe right from the watch face and tap the card. Set it back to `default` afterwards, or alarms
+will stop opening the ringing screen.
 
 Known not to work: voice control. Neither its first version nor the reworked listener responds on
 this watch. The owner has decided to leave it as it is, so it is not being fixed. It is off by
@@ -147,7 +150,7 @@ Build, or build and install on a connected watch:
 ```
 
 Switching from a build signed with a different key (for example a debug build) requires
-`adb uninstall com.akvalentine.bigalarm` first, which also clears the alarms and the overlay grant
+`adb uninstall com.akvalentine.bigalarm` first, which also clears the alarms and the optional grant
 described below. After that, every update is just `installRelease` and alarms are kept.
 
 ## Put it on the watch
@@ -187,23 +190,37 @@ use the Run button instead.
 On first launch the app asks for notification permission. Allow it, otherwise the ringing
 notification (and its Dismiss / Snooze buttons) cannot be shown.
 
-## Optional: make the ringing screen pop up by itself
+## The ringing screen opening by itself
 
-Google's docs state that full-screen-intent notifications are not supported on Wear OS, and Android
-blocks apps from opening a screen from the background. Out of the box, the watch therefore buzzes,
-wakes the screen and shows a notification; tapping it opens the big-text ringing screen with
-Dismiss and Snooze.
+On the Galaxy Watch5 with One UI 8 Watch the big-text ringing screen opens by itself when an alarm
+fires. Nothing has to be set up for that on this watch.
 
-Android does allow the launch when the app holds the "draw over other apps" permission. Wear OS has
-no settings page for it, but it can be granted once over adb:
+It gets there through the ringing notification's full-screen request. Google's docs state that
+full-screen-intent notifications are not supported on Wear OS, but Samsung's watch software honours
+them, as a developer report had suggested. The service also starts the ringing screen directly,
+which Android only permits from the background with the "draw over other apps" grant.
+
+Established on the watch on 18 Nov 2026:
+
+- With that grant withdrawn (`adb shell appops get com.akvalentine.bigalarm SYSTEM_ALERT_WINDOW`
+  printed `default`), the screen still opened by itself.
+- With the full-screen request denied as well
+  (`adb shell appops set com.akvalentine.bigalarm USE_FULL_SCREEN_INTENT deny`), it no longer did.
+  Setting that back to `default` restores the pop-up.
+
+Earlier notes in this project assumed the grant was required. It is not, on this watch.
+
+If the ringing screen ever does not open by itself, on this or another watch, the watch still
+buzzes, wakes and shows a notification with Dismiss and Snooze, and tapping it opens the ringing
+screen. In that case the grant is worth trying. Wear OS has no settings page for it, but it can be
+given once over adb:
 
 ```bash
 adb shell appops set com.akvalentine.bigalarm SYSTEM_ALERT_WINDOW allow
 ```
 
-The Settings screen in the app reports whether this is on. Revoke with `... SYSTEM_ALERT_WINDOW
-default`. Confirmed working on a Galaxy Watch5 running One UI 8 Watch: with the grant in place the
-ringing screen opens by itself when the alarm fires.
+The Settings screen in the app shows whether the grant is on. Withdraw it with `default` in place
+of `allow`.
 
 ## How it works
 
@@ -269,19 +286,24 @@ The app on the watch is unaffected; it keeps running the last installed build.
 
 ## Known limitations and ideas
 
-- The ringing screen only opens by itself after the one-time adb step above.
+- The ringing screen opens by itself through a full-screen notification request, which Google
+  documents as unsupported on Wear OS. One UI 8 Watch honours it; other watches may not.
 - No phone companion yet. A phone app for editing alarms with a real keyboard would use the Wear
   Data Layer API; the standalone design leaves room for it.
 - No tile or watch-face complication yet. A tile showing the next alarm would be a natural addition.
 - The notification text uses the system font size. Only the app's own screens get the big text.
 - The notification panel (swipe right from the watch face) is drawn by the watch, and Wear OS does
   not allow custom notification layouts. The app asks for its yellow there with `setColor` and
-  `setColorized`; how much of the card and its Dismiss and Snooze buttons turn yellow is up to
-  One UI Watch.
+  `setColorized`, and for yellow labels and icons on the Dismiss and Snooze buttons. What the watch
+  does with those requests is up to One UI Watch; see Status for what has been observed. The
+  colours of the watch's own buttons belong to the watch's theme, which no app can change. Wear OS 6
+  can take its system colours from the watch face, and a pre-release look at One UI 8 Watch showed a
+  colour theme under Settings, Display. Whether the shipped software on the Galaxy Watch5 offers
+  either has not been checked.
 - Voice control cannot be reached through Bixby or Google Assistant; third-party watch apps have no
   hook into either. The in-app listener is the practical alternative.
-- Button snooze only works while the ringing screen is showing, so it needs the overlay grant above
-  (or a tap on the notification first). Anything else that takes the user away from the ringing
+- Button snooze only works while the ringing screen is showing. If that screen has not opened, tap
+  the notification first. Anything else that takes the user away from the ringing
   screen by their own action, such as a long-press that opens an assistant, also snoozes.
 
 ## References
@@ -298,6 +320,8 @@ The app on the watch is unaffected; it keeps running the last installed build.
   <https://developer.android.com/guide/components/activities/background-starts>
 - Notifications on Wear OS (full-screen intents unsupported):
   <https://developer.android.com/training/wearables/notifications/creating>
+- Developer report that Samsung watch builds honour full-screen notifications (forum thread):
+  <https://slack-chats.kotlinlang.org/t/13254400/hi-i-want-to-be-able-to-display-fullscreen-notification-to-d>
 - Compose for Wear OS releases: <https://developer.android.com/jetpack/androidx/releases/wear-compose>
 - Android Gradle plugin 9 built-in Kotlin: <https://developer.android.com/build/migrate-to-built-in-kotlin>
 - Text input on Wear OS, `RemoteInputIntentHelper`:

@@ -169,8 +169,8 @@ fun SettingsScreen(onTextSize: () -> Unit, onSnooze: () -> Unit, onAutoSilence: 
             }
             item {
                 Text(
-                    if (popupAllowed) "Ringing screen pops up by itself: on"
-                    else "Ringing screen pops up by itself: off (see README for the adb command)",
+                    if (popupAllowed) "Pop-up grant (adb): on"
+                    else "Pop-up grant (adb): off. Only needed if the ring screen does not open by itself.",
                     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

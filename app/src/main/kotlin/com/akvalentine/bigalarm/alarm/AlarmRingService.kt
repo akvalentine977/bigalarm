@@ -11,7 +11,10 @@ import android.content.pm.ServiceInfo
 import android.graphics.drawable.Icon
 import android.os.IBinder
 import android.os.PowerManager
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.format.DateFormat
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import com.akvalentine.bigalarm.BigAlarmApp
 import com.akvalentine.bigalarm.R
@@ -33,9 +36,12 @@ import kotlinx.coroutines.launch
  * Foreground service that makes an alarm ring: vibration, optional sound, a wake lock, a
  * high-priority notification with Dismiss/Snooze actions, and the full-screen ringing activity.
  *
- * Wear OS does not honour full-screen intents, and Android blocks activity launches from the
- * background, so the activity opens automatically only when the user has granted the optional
- * overlay permission (see README). Otherwise the user taps the notification.
+ * Google's docs say Wear OS does not honour full-screen intents, and Android restricts activity
+ * launches from the background. Both routes are tried anyway: the notification carries a
+ * full-screen request and the service starts the activity directly. On the Galaxy Watch5 (One UI 8
+ * Watch) the full-screen request is what opens the screen; the overlay grant is not needed there.
+ * Where the screen does not open, the user taps the notification, or grants the overlay
+ * permission over adb (see README).
  */
 class AlarmRingService : Service() {
 
@@ -185,7 +191,7 @@ class AlarmRingService : Service() {
         // trigger onUserLeaveHint (which the ringing screen itself treats as a Home-button press).
         val intent = Intent(this, AlarmRingActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION)
-        // Silently blocked by the system unless the overlay permission was granted via adb.
+        // The system may silently block this while the app is in the background; see the class comment.
         runCatching { startActivity(intent) }.onFailure { Log.w(TAG, "Could not open ringing screen", it) }
     }
 
@@ -210,7 +216,9 @@ class AlarmRingService : Service() {
             Intent(this, AlarmRingActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val icon = Icon.createWithResource(this, R.drawable.ic_notification)
+        // The buttons the watch shows for these actions are drawn by the watch. All an app supplies
+        // is an icon and a label, so the accent colour is requested on both.
+        val icon = Icon.createWithResource(this, R.drawable.ic_notification).setTint(Brand.YELLOW_ARGB)
         return Notification.Builder(this, BigAlarmApp.CHANNEL_RINGING)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
@@ -226,10 +234,22 @@ class AlarmRingService : Service() {
             .setOnlyAlertOnce(true)
             .setContentIntent(open)
             .setFullScreenIntent(open, true)
-            .addAction(Notification.Action.Builder(icon, "Dismiss", servicePendingIntent(ACTION_DISMISS, 1)).build())
-            .addAction(Notification.Action.Builder(icon, "Snooze $snoozeMinutes min", servicePendingIntent(ACTION_SNOOZE, 2)).build())
+            .addAction(Notification.Action.Builder(icon, accented("Dismiss"), servicePendingIntent(ACTION_DISMISS, 1)).build())
+            .addAction(
+                Notification.Action.Builder(
+                    icon,
+                    accented("Snooze $snoozeMinutes min"),
+                    servicePendingIntent(ACTION_SNOOZE, 2),
+                ).build(),
+            )
             .build()
     }
+
+    /** [text] with the accent colour requested for it. The watch's notification UI may ignore the colour. */
+    private fun accented(text: String): CharSequence =
+        SpannableString(text).apply {
+            setSpan(ForegroundColorSpan(Brand.YELLOW_ARGB), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
 
     private fun servicePendingIntent(action: String, requestCode: Int): PendingIntent =
         PendingIntent.getService(
