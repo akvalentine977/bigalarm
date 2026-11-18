@@ -67,9 +67,17 @@ Open items as of 18 Nov 2026, all built and installed on the watch but not yet c
 - The yellow request for the notification panel, which the watch may honour fully, partly or not
   at all. This waits for an occasion when an alarm rings without the ringing screen in front.
 
-The tag `watch-ok-2026-11-18` marks commit `3e070df`, the code of the build installed on the watch
-that day, where button snooze was confirmed. The commits after it change only this README. See also
-the development-machine issue near the end of this file.
+Commit `3e070df` is the code of the build installed on the watch on 18 Nov 2026, where button snooze
+was confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
+`git tag` does not list that tag, it still has to be created, because the session that recorded the
+confirmation was not allowed to push tags:
+
+```bash
+git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze works"
+git push origin watch-ok-2026-11-18
+```
+
+See also the development-machine issue near the end of this file.
 
 This project lives at <https://github.com/akvalentine977/bigalarm>. It was moved there on 17 Nov 2026
 from a `projects/bigalarm` folder in an earlier repository that no longer exists. The commit history
