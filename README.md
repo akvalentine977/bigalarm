@@ -82,14 +82,10 @@ this watch. The owner has decided to leave it as it is, so it is not being fixed
 default and nothing else depends on it.
 
 Commit `3e070df` is the code of the build installed on the watch on 18 Nov 2026, where button snooze,
-switching an edited alarm back on and the editor contrast fix were confirmed. The commits after it change only this README. Its tag is `watch-ok-2026-11-18`. If
-`git tag` does not list that tag, it still has to be created, because the session that recorded the
-confirmation was not allowed to push tags:
-
-```bash
-git tag -a watch-ok-2026-11-18 3e070df -m "Confirmed on the watch on 18 Nov 2026: button snooze, edit-turns-alarm-on and editor contrast"
-git push origin watch-ok-2026-11-18
-```
+switching an edited alarm back on and the editor contrast fix were confirmed. It carries the tag
+`watch-ok-2026-11-18`. A later build, from commit `58b3b09`, was installed the same day. It differs
+only in the colour request for the notification buttons and in wording, and is the build on the
+watch now.
 
 See also the development-machine issue near the end of this file.
 
@@ -266,6 +262,8 @@ existing alarms.
   a watch.
 - A build that has been confirmed working on the watch gets a tag on its commit, named
   `watch-ok-YYYY-MM-DD`. To rebuild a version known to work, check out the newest such tag.
+- Tags are created and pushed from the owner's machine. The assistant sessions that work on this
+  repository have been able to push branches but not tags.
 
 ## Open issue: desktop lock-ups on the development machine
 
