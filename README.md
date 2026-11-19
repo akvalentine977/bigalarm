@@ -264,6 +264,8 @@ existing alarms.
   `watch-ok-YYYY-MM-DD`. To rebuild a version known to work, check out the newest such tag.
 - Tags are created and pushed from the owner's machine. The assistant sessions that work on this
   repository have been able to push branches but not tags.
+- A session that picks this project up on the owner's machine should read `HANDOFF.md` first. It
+  covers the hazards of that machine and watch, and the agreements made with the owner.
 
 ## Open issue: desktop lock-ups on the development machine
 
